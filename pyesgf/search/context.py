@@ -106,11 +106,12 @@ class SearchContext(object):
     # Functional search interface
     # These do not change the constraints on self.
 
-    def search(self, batch_size=DEFAULT_BATCH_SIZE, ignore_facet_check=False, **constraints):
+    def search(self, batch_size=DEFAULT_BATCH_SIZE, ignore_facet_check=False, facets=None, **constraints):
         """
         Perform the search with current constraints returning a set of results.
 
         :batch_size: The number of results to get per HTTP request.
+        :facets: Additional facets used for facet_counts
         :param constraints: Further constraints for this query.  Equivilent
             to calling self.constrain(**constraints).search()
         :return: A ResultSet for this query
@@ -187,7 +188,7 @@ class SearchContext(object):
 
         return facet_options
 
-    def __update_counts(self, ignore_facet_check=False): 
+    def __update_counts(self, ignore_facet_check=False):
         # If hit_count is set the counts are already retrieved
         if self.__hit_count is not None:
             return
@@ -201,10 +202,12 @@ class SearchContext(object):
 
         response = self.connection.send_search(query_dict, limit=0)
 
-        # add size to facet counts
-        query_dict['facets'] = 'size'
-        size_response = self.connection.send_search(query_dict, limit=0)
-        response['facet_counts']['facet_fields']['size'] = size_response['facet_counts']['facet_fields']['size']
+        if self.facets:
+            for facet in self.facets.split(','):
+                if facet not in response['facet_counts']['facet_fields']:
+                    query_dict['facets'] = facet
+                    response_tmp = self.connection.send_search(query_dict, limit=0)
+                    response['facet_counts']['facet_fields'][facet] = response_tmp['facet_counts']['facet_fields'][facet]
 
         for facet, counts in (
             response['facet_counts']['facet_fields'].items()):
