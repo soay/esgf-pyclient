@@ -106,12 +106,11 @@ class SearchContext(object):
     # Functional search interface
     # These do not change the constraints on self.
 
-    def search(self, batch_size=DEFAULT_BATCH_SIZE, ignore_facet_check=False, facets=None, **constraints):
+    def search(self, batch_size=DEFAULT_BATCH_SIZE, ignore_facet_check=False, **constraints):
         """
         Perform the search with current constraints returning a set of results.
 
         :batch_size: The number of results to get per HTTP request.
-        :facets: Additional facets used for facet_counts
         :param constraints: Further constraints for this query.  Equivilent
             to calling self.constrain(**constraints).search()
         :return: A ResultSet for this query
