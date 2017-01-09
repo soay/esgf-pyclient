@@ -1,6 +1,23 @@
 Release Notes
 =============
 
+Release 0.1.8
+-------------
+
+This release includes the following changes:
+
+ 1. The tests have been updated and various fixes made to make them match the up-to-date ESGF Search API.
+ 2. Following problems with the search being slow in certain scenarios an extra call to the Search service 
+    was made optional through the :meth:`SearchContext.search()` method. If you send the argument and value
+    of `ignore_facet_check=True` then this hidden call to the service will be avoided. This typically saves
+    2 seconds of wait time which can be very important in some iterative search scenarios.
+ 3. The :meth:`SearchContext.search()` method was also extended so that the argument `batch_size` could be
+    directly sent to it in order to manage how the calls to the API would be separated out into batches. This
+    does not affect the final result but may affect the speed of the response. The batch size can also be set
+    as a default in the :mod:`pyesgf.search.consts` module.
+ 4. Searches at the file-level now return a `gridftp_url` property along with other existing properties such
+    as `download_url`. 
+
 Release 0.1b1
 -------------
 
